@@ -6,7 +6,10 @@ require("dotenv").config();
 const port = process.env.PORT || 5000;
 
 // middlewares
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:5174"],
+  credentials: true,
+}));
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.sykxlbw.mongodb.net/?retryWrites=true&w=majority`;
