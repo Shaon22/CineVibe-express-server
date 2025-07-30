@@ -6,10 +6,13 @@ require("dotenv").config();
 const port = process.env.PORT || 5000;
 
 // middlewares
+const allowedOrigins = ['https://fabulous-cuchufli-a17c9f.netlify.appj'];
+
 app.use(cors({
-  origin:["http://localhost:5174", "https://earnest-starlight-377e56.netlify.app"],
-  credentials: true,
+  origin: allowedOrigins,
+  credentials: true, // if you're using cookies or auth headers
 }));
+
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.sykxlbw.mongodb.net/?retryWrites=true&w=majority`;
