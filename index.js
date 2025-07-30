@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const app = express();
 
-const allowedOrigins = ['https://stupendous-pavlova-9e0b9a.netlify.app'];
+const allowedOrigins = ['https://lucent-semifreddo-d25811.netlify.app'];
 
 app.use(cors({
   origin: function(origin, callback) {
