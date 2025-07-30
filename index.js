@@ -6,7 +6,7 @@ require("dotenv").config();
 const port = process.env.PORT || 5000;
 
 // middlewares
-const allowedOrigins = ['https://fabulous-cuchufli-a17c9f.netlify.appj'];
+const allowedOrigins = ['https://fabulous-cuchufli-a17c9f.netlify.app'];
 
 app.use(cors({
   origin: allowedOrigins,
