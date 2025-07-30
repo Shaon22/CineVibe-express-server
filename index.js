@@ -9,9 +9,20 @@ const port = process.env.PORT || 5000;
 const allowedOrigins = ['https://boisterous-banoffee-85e31d.netlify.app'];
 
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true, // if you're using cookies or auth headers
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
 }));
+app.use((req, res, next) => {
+  console.log(`Received request: ${req.method} ${req.url}`);
+  next();
+});
 
 app.use(express.json());
 
