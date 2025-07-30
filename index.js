@@ -1,16 +1,15 @@
 const express = require("express");
-const app = express();
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
-const port = process.env.PORT || 5000;
 
-// middlewares
+const app = express();
+
 const allowedOrigins = ['https://boisterous-banoffee-85e31d.netlify.app'];
 
 app.use(cors({
   origin: function(origin, callback) {
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, true); // allow non-browser requests like Postman
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -19,16 +18,10 @@ app.use(cors({
   },
   credentials: true,
 }));
-app.use((req, res, next) => {
-  console.log(`Received request: ${req.method} ${req.url}`);
-  next();
-});
 
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.sykxlbw.mongodb.net/?retryWrites=true&w=majority`;
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -38,68 +31,62 @@ const client = new MongoClient(uri, {
   },
 });
 
-async function run() {
-  try {
-    // Connect the client to the server(optional starting in v4.7)
+let movieCollection, seriesCollection, blogsCollection;
+
+async function connectDb() {
+  if (!client.isConnected?.()) {
     await client.connect();
-   const movieCollection = client.db("CineVibe").collection("movies");
-    const seriesCollection = client.db("CineVibe").collection("series");
-    const blogsCollection = client.db("CineVibe").collection("blogs");
-
-    app.get("/api/allMovies", async (req, res) => {
-      const cursor = movieCollection.find();
-      const result = await cursor.toArray();
-      res.send(result);
-    });
-
-    app.get("/api/allMovies/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await movieCollection.findOne(query);
-      res.send(result);
-    });
-
-    app.get("/api/allSeries", async (req, res) => {
-      const cursor = seriesCollection.find();
-      const result = await cursor.toArray();
-      res.send(result);
-    });
-
-    app.get("/api/allSeries/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await seriesCollection.findOne(query);
-      res.send(result);
-    });
-
-    app.get("/api/allBlogs", async (req, res) => {
-      const cursor = blogsCollection.find();
-      const result = await cursor.toArray();
-      res.send(result);
-    });
-
-    app.get("/api/allBlogs/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await blogsCollection.findOne(query);
-      res.send(result);
-    });
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
-  } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
+    const db = client.db("CineVibe");
+    movieCollection = db.collection("movies");
+    seriesCollection = db.collection("series");
+    blogsCollection = db.collection("blogs");
   }
 }
-run().catch(console.dir);
+
+// Routes
+
+app.get("/api/allMovies", async (req, res) => {
+  await connectDb();
+  const result = await movieCollection.find().toArray();
+  res.json(result);
+});
+
+app.get("/api/allMovies/:id", async (req, res) => {
+  await connectDb();
+  const id = req.params.id;
+  const result = await movieCollection.findOne({ _id: new ObjectId(id) });
+  res.json(result);
+});
+
+app.get("/api/allSeries", async (req, res) => {
+  await connectDb();
+  const result = await seriesCollection.find().toArray();
+  res.json(result);
+});
+
+app.get("/api/allSeries/:id", async (req, res) => {
+  await connectDb();
+  const id = req.params.id;
+  const result = await seriesCollection.findOne({ _id: new ObjectId(id) });
+  res.json(result);
+});
+
+app.get("/api/allBlogs", async (req, res) => {
+  await connectDb();
+  const result = await blogsCollection.find().toArray();
+  res.json(result);
+});
+
+app.get("/api/allBlogs/:id", async (req, res) => {
+  await connectDb();
+  const id = req.params.id;
+  const result = await blogsCollection.findOne({ _id: new ObjectId(id) });
+  res.json(result);
+});
 
 app.get("/", (req, res) => {
   res.send("server is running");
 });
 
-app.listen(port, () => {
-  console.log(`server is running on ${port}`);
-});
+// Export the app for Vercel
+module.exports = app;
