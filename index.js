@@ -35,39 +35,39 @@ async function run() {
     const seriesCollection = client.db("CineVibe").collection("series");
     const blogsCollection = client.db("CineVibe").collection("blogs");
 
-    app.get("/allMovies", async (req, res) => {
+    app.get("/api/allMovies", async (req, res) => {
       const cursor = movieCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
 
-    app.get("/allMovies/:id", async (req, res) => {
+    app.get("/api/allMovies/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await movieCollection.findOne(query);
       res.send(result);
     });
 
-    app.get("/allSeries", async (req, res) => {
+    app.get("/api/allSeries", async (req, res) => {
       const cursor = seriesCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
 
-    app.get("/allSeries/:id", async (req, res) => {
+    app.get("/api/allSeries/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await seriesCollection.findOne(query);
       res.send(result);
     });
 
-    app.get("/allBlogs", async (req, res) => {
+    app.get("/api/allBlogs", async (req, res) => {
       const cursor = blogsCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
 
-    app.get("/allBlogs/:id", async (req, res) => {
+    app.get("/api/allBlogs/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await blogsCollection.findOne(query);
